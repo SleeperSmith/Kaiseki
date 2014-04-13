@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 	<metadata>
-		<id>sample</id>
+		<id>Kaiseki</id>
 		<version>1.0.0</version>
-		<authors>Microsoft</authors>
+		<authors>Jason Chen</authors>
+		<description>A set of psake tasks for building .net solutions.</description>
 		<dependencies>
 			<dependency id="Mono.Gendarme" version="2.11.0.20121120" />
 			<dependency id="OpenCover" version="4.5.2506" />

@@ -1,0 +1,1 @@
+."build\Nuget.exe" pack .\src\Kaiseki.nuspec

@@ -1,4 +1,4 @@
-task CreateCiOut -precondition {
+task New-CiOutFolder -precondition {
     return !(Test-Path $OutputPath)
 } {
 
@@ -55,7 +55,7 @@ properties {
     #MsBuild Auto Parmeterise Connection String in Web.config
     $MsbApcs = "true"
 }
-Task Invoke-MsBuild -depends Get-TargetSolution {
+Task Execute-MsBuild -depends Get-TargetSolution {
 
     <#$regKey = "HKLM:\software\Microsoft\MSBuild\ToolsVersions\$DotNetVersion"
     $regProperty = "MSBuildToolsPath"
@@ -81,7 +81,7 @@ Task Invoke-MsBuild -depends Get-TargetSolution {
     }
 	
     $DynamicArgs = "/p:$MsbConfigurationParam$MsbApcsParam$MsbVsVersionParam"
-    Write-Host "> Static Args: $DynamicArgs"
+    Write-Host "> Dynamic Args: $DynamicArgs"
 
     $StaticArgs = "/p:TargetProfile=Local;DeployTarget=Package;PackageLocation=CiWebDeploy\Site.zip;RunCodeAnalysis=True;DeployOnBuild=True"
     Write-Host "> Static Args: $StaticArgs"
@@ -118,7 +118,7 @@ Task Transform-InjectBuildInfo {
 properties {
     $NugetBinPath = .".\.nuget\NuGet.exe"
 }
-Task New-NugetPackagesFromSpecFiles -depends Invoke-MsBuild {
+Task New-NugetPackagesFromSpecFiles -depends Execute-MsBuild {
 	$command = "pack"
 
     Write-Host "> Packing nuget packages with version number $AssemblyVersion"

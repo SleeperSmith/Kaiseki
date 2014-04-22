@@ -14,7 +14,9 @@ properties {
     $AssemblyVersion = "1.0.0.0"
 }
 
-Task Default -depends Clean,CreateCiOut,Transform-InjectBuildInfo,Invoke-MsBuild,New-NugetPackagesFromSpecFiles
+Task Default -depends Clean,New-CiOutFolder,Transform-InjectBuildInfo,
+    Execute-PreBuildAnalysis,Execute-MsBuild,Execute-PostBuildAnalysis,
+    New-NugetPackagesFromSpecFiles
 
 Write-Host "## Loading Modules > Done ##"
 Write-Host

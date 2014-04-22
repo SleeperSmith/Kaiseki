@@ -1,14 +1,14 @@
 task Execute-Gendarme {
     $gendarmeToolsPath = ".\packages\Mono.Gendarme.2.11.0.20121120\tools\"
     # If rule.xml do not exist, copy it over.
-    if (!(Test-Path .\rules.xml)) {
+    if (Test-Path .\rules.xml) {
         Write-Host "> No .\rules.xml found. Copying default one over"
-        Copy-Item "$gendarmeToolsPathrules.xml" ".\rules.xml"
+        Copy-Item ".\rules.xml" "$gendarmeToolsPath\rules.xml" -Force
     }
 
     # This is defined in the nuspec.
     $gendarmeBin = "$($gendarmeToolsPath)gendarme.exe"
-    $gendarmeOutPath = $CiOutPath + "\Gendarme.xml"
+    $gendarmeOutPath = $OutputPath + "\Gendarme.xml"
     $rulesXml = "rules.xml"
 
     Get-ChildItem *.csproj -Recurse | %{
@@ -28,8 +28,8 @@ task Execute-Gendarme {
         Write-Host "> Analysing: $assemblyRelativePath"
         $dllSpecificOut = $gendarmeOutPath.Replace(".xml", ".$assemblyName.xml")
         Write-Host "> Analysis Result: $dllSpecificOut"
-        exec { &$gendarmeBin $assemblyRelativePath --config $rulesXml }
 
+        &$gendarmeBin $assemblyRelativePath --xml $dllSpecificOut > (Out-Null)
     }
 }
 
@@ -53,7 +53,7 @@ task Execute-VisualStudioCodeMetrics -precondition {
 
 } {
 
-    $vscmOutPath = $CiOutPath + "\Vscm.xml"
+    $vscmOutPath = $OutputPath + "\Vscm.xml"
 
     Get-ChildItem *.csproj -Recurse | %{
 

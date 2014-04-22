@@ -1,12 +1,21 @@
-
+Write-Host "## Loading Modules ##"
 
 cd $psake.context.originalDirectory
 
-Write-Host "== Loading Modules =="
 Get-ChildItem Tasks-*.ps1 -Recurse -File | % {
     Write-Host Loading $_.Name
     Include $_
 }
-Write-Host "== Loading Modules > Done =="
 
-Task Default -depends Clean,CreateCiOut,Invoke-MsBuild
+#Global properties
+properties {
+    $OutputPath = "CiOutput"
+    # Hard code for now.
+    $AssemblyVersion = "1.0.0.0"
+}
+
+Task Default -depends Clean,CreateCiOut,Transform-InjectBuildInfo,Invoke-MsBuild,New-NugetPackagesFromSpecFiles
+
+Write-Host "## Loading Modules > Done ##"
+Write-Host
+Write-Host

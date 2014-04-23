@@ -49,7 +49,7 @@ properties {
     #$DotNetVersion = "4.0"
 
     #MsBuild Visual Studio Version
-	$MsbVsVersion
+	$MsbVsVersion = "12"
     #MsBuild Configuration
     $MsbConfiguration = "Release"
     #MsBuild Auto Parmeterise Connection String in Web.config
@@ -116,7 +116,7 @@ Task Transform-InjectBuildInfo {
 }
 
 properties {
-    $NugetBinPath = .".\.nuget\NuGet.exe"
+    $NugetBinPath = ".\.nuget\NuGet.exe"
 }
 Task New-NugetPackagesFromSpecFiles -depends Execute-MsBuild {
 	$command = "pack"
@@ -129,7 +129,7 @@ Task New-NugetPackagesFromSpecFiles -depends Execute-MsBuild {
 
     foreach($nuspecFile in $nuspecFiles) {
         Write-Host "> Packing $($nuspecFile.FullName)"
-        &"$NugetBinPath" $command $nuspecFile.FullName -Prop Version=$assemblyVersion
+        &"$NugetBinPath" $command $nuspecFile.FullName -Prop Version=$AssemblyVersion
     }
 
     #Move all .nupkg files to output folder.

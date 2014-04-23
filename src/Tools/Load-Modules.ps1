@@ -16,6 +16,7 @@ properties {
 
 Task Default -depends Clean,New-CsvOutputCollection,New-CiOutFolder,Transform-InjectBuildInfo,
     Execute-PreBuildAnalysis,Execute-MsBuild,Execute-PostBuildAnalysis,
+    Execute-Nunit,
     New-NugetPackagesFromSpecFiles,Write-CsvOutputCollection
 
 Write-Host "## Loading Modules > Done ##"

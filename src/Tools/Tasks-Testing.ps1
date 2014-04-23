@@ -40,25 +40,25 @@ task Execute-Nunit -depends Get-TargetSolution -precondition {
     }) -join ' '
     	
     # Filter test category
-	if ($TestCategory -ne "") {
+	<#if ($TestCategory -ne "") {
 		$targetArgsNunitArgs = $targetArgsNunitArgs + " /include:`"$TestCategory`""
 		$fileCatName = $TestCategory.
 			Replace(",", ".")
 		$targetArgsNunitArgs = $targetArgsNunitArgs.
             Replace($nunitOut, "nunit.$fileCatName.xml")
-	}
+	}#>
 	
 	#solution used as run target.
+    $targetArgsArg = "-targetargs:$assemblies $targetArgsNunitArgs"
 
 	if ($assemblyInclusionPrefix -eq "") {
 		$assemblyInclusionPrefix = $solutionName.Substring(0, $solutionName.Length - 4)
 	}
     $filterInnerArg = "+[" + $assemblyInclusionPrefix + "*]* -[*Tests]* -[*Test]*"
-
     $filterArg = "-filter:$filterInnerArg"
+
+    $targetArg = "-target:$((Resolve-Path $nunitBinPath.FullName -Relative).Replace('.\', ''))"
     $outputArg = "-output:$CiOutPath$opencoverNunitOut"
-    $targetArg = "-target:$BuildToolsPath$nunitBin"
-    $targetArgsArg = "-targetargs:$assemblies $targetArgsNunitArgs"
 	
 	#run
     exec { &$opencoverBinPath $targetArg $filterArg "-register:user" $targetArgsArg $outputArg }

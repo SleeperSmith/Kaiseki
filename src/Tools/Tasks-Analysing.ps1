@@ -90,3 +90,18 @@ task Execute-VisualStudioCodeMetrics -precondition {
 
 task Execute-PreBuildAnalysis #-depends DryAnalysis,CcmAnalysis,StyleCopAnalysis
 task Execute-PostBuildAnalysis -depends Execute-VisualStudioCodeMetrics,Execute-Gendarme
+
+task New-CsvOutputCollection {
+    $Script:CsvOutputCollection = New-Object 'System.Collections.Generic.Dictionary[string,int]'
+    #$Script:CsvOutputCollection.Add("Unit Test Coverage", 0)
+}
+
+task Write-CsvOutputCollection -depends New-CsvOutputCollection {
+
+    $valuesCollection = $Script:CsvOutputCollection
+    $csvOutput = [string]::Join("`t", $valuesCollection.Keys)
+    $csvOutput += "`n"
+    $csvOutput += [string]::Join("`t", $valuesCollection.Values)
+
+    Set-Content "$($OutputPath)\OutputCollection.csv" -Value $csvOutput
+}

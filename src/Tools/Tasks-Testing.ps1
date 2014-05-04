@@ -1,3 +1,6 @@
+properties {
+    $TestProjectSuffix = "UnitTests"
+}
 task Execute-Nunit -depends Get-TargetSolution -precondition {
     Write-Host ?Execute-Nunit?
     $nunitRunnersDirs = Get-ChildItem .\packages -Filter NUnit.Runners.* -Directory
@@ -18,11 +21,13 @@ task Execute-Nunit -depends Get-TargetSolution -precondition {
     $nunitBinPath = Get-ChildItem $nunitRunnersDir.FullName -Filter nunit-console.exe -Recurse -File
 	
 	#args
-	$targetArgsNunitArgs = "/config:Release /noshadow /xml:$CiOutput\NUnit.UnitTests.xml"
+	$targetArgsNunitArgs = "/config:Release /noshadow /xml:$OutputPath\NUnit.UnitTests.xml"
 	$solutionName = $targetSolution.Name
 	$outputFolder = "bin\Release\"
 
-    $assemblies = (Get-ChildItem *.csproj -Recurse | % {
+    $assemblies = (Get-ChildItem *.csproj -Recurse | ? {
+        $_.FullName.EndsWith("$TestProjectSuffix.csproj")
+    } | % {
 
         $searchDirectory = Resolve-Path $_.Directory.FullName -Relative
 
@@ -58,8 +63,35 @@ task Execute-Nunit -depends Get-TargetSolution -precondition {
     $filterArg = "-filter:$filterInnerArg"
 
     $targetArg = "-target:$((Resolve-Path $nunitBinPath.FullName -Relative).Replace('.\', ''))"
-    $outputArg = "-output:$CiOutPath$opencoverNunitOut"
+    $outputArg = "-output:$OutputPath\opencover.nunit.xml"
 	
 	#run
     exec { &$opencoverBinPath $targetArg $filterArg "-register:user" $targetArgsArg $outputArg }
+}
+
+task Copy-Nunit -depends New-CiOutFolder -precondition {
+    Write-Host ?Copy-Nunit?
+    $nunitRunnersDirs = Get-ChildItem .\packages -Filter NUnit.Runners.* -Directory
+
+    if ($nunitRunnersDirs.Count -eq 0) {
+        return $false
+    }
+
+    return $true
+} {
+    $nunitRunnersDir = (Get-ChildItem .\packages -Filter NUnit.Runners.* -Directory)[0]
+
+    Copy-Item $nunitRunnersDir.FullName $ArtefactPath -Recurse -Force
+}
+
+task Execute-ReportGenerator {
+	#bin
+    $reportGeneratorBinPath = ".\packages\ReportGenerator.1.9.1.0\ReportGenerator.exe"
+
+	#args
+    $reportsArg = "-reports:$OutputPath\opencover.*.xml"
+    $targetDirArg = "-targetdir:$OutputPath\CoverageReport"
+
+	#run
+    exec { &$reportGeneratorBinPath $reportsArg $targetDirArg}
 }

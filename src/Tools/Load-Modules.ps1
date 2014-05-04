@@ -10,14 +10,16 @@ Get-ChildItem Tasks-*.ps1 -Recurse -File | % {
 #Global properties
 properties {
     $OutputPath = "CiOutput"
+    $ArtefactPath = "CiArtefact"
     # Hard code for now.
     $AssemblyVersion = "1.0.0.0"
 }
 
 Task Default -depends Clean,New-CsvOutputCollection,New-CiOutFolder,Transform-InjectBuildInfo,
     Execute-PreBuildAnalysis,Execute-MsBuild,Execute-PostBuildAnalysis,
-    Execute-Nunit,
-    New-NugetPackagesFromSpecFiles,Write-CsvOutputCollection
+    Execute-Nunit,Execute-ReportGenerator,
+    New-NugetPackagesFromSpecFiles,Write-CsvOutputCollection,
+    Copy-Nunit
 
 Write-Host "## Loading Modules > Done ##"
 Write-Host

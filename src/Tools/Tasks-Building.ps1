@@ -4,6 +4,9 @@ task New-CiOutFolder -precondition {
 
     $newItem = New-Item -ItemType directory -Path $OutputPath
     Write-Host "> Created: $($newItem.FullName)"
+
+    $newItem = New-Item -ItemType directory -Path $ArtefactPath
+    Write-Host "> Created: $($newItem.FullName)"
 }
 
 task Clean {

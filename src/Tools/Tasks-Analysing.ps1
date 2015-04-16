@@ -1,9 +1,10 @@
 task Execute-Gendarme {
     $gendarmeToolsPath = ".\packages\Mono.Gendarme.2.11.0.20121120\tools\"
+    $replacingRulesXmlPath = ".\kaiseki-bootstrap\rules.xml"
     # If rule.xml do not exist, copy it over.
-    if (Test-Path .\rules.xml) {
+    if (Test-Path $replacingRulesXmlPath) {
         Write-Host "> No .\rules.xml found. Copying default one over"
-        Copy-Item ".\rules.xml" "$gendarmeToolsPath\rules.xml" -Force
+        Copy-Item $replacingRulesXmlPath "$gendarmeToolsPath\rules.xml" -Force
     }
 
     # This is defined in the nuspec.

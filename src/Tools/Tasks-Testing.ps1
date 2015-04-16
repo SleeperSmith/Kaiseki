@@ -27,7 +27,8 @@ task Execute-Nunit -depends Get-TargetSolution -precondition {
 	$outputFolder = "bin\Release\"
 
     $assemblies = (Get-ChildItem *.csproj -Recurse | ? {
-        $_.FullName.EndsWith("$TestProjectSuffix.csproj")
+        #$_.FullName.EndsWith("$TestProjectSuffix.csproj")
+        $true
     } | % {
 
         $searchDirectory = Resolve-Path $_.Directory.FullName -Relative
@@ -49,7 +50,7 @@ task Execute-Nunit -depends Get-TargetSolution -precondition {
 	if ($TestCategory -ne "") {
 		$targetArgsNunitArgs = $targetArgsNunitArgs + " /include:`"$TestCategory`""
 		$fileCatName = $TestCategory.Replace(",", ".")
-		$targetArgsNunitArgs = $targetArgsNunitArgs.Replace($nunitOut, "nunit.$fileCatName.xml")
+		$targetArgsNunitArgs = $targetArgsNunitArgs.Replace("NUnit.UnitTests.xml", "NUnit.$fileCatName.xml")
 	}
 	
 	#solution used as run target.

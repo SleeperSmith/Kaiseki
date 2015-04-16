@@ -1,12 +1,16 @@
-task New-CiOutFolder -precondition {
-    return !(Test-Path $OutputPath)
-} {
+task New-CiOutFolder {
 
-    $newItem = New-Item -ItemType directory -Path $OutputPath
-    Write-Host "> Created: $($newItem.FullName)"
+	if (Test-Path ".\$OutputPath") {
+        Remove-Item ".\$OutputPath" -Force -Recurse
+	}
+	$newItem = New-Item -ItemType directory -Path $OutputPath
+	Write-Host "> Created: $($newItem.FullName)"
 
-    $newItem = New-Item -ItemType directory -Path $ArtefactPath
-    Write-Host "> Created: $($newItem.FullName)"
+	if (Test-Path ".\$ArtefactPath") {
+        Remove-Item ".\$ArtefactPath" -Force -Recurse
+    }
+	$newItem = New-Item -ItemType directory -Path $ArtefactPath
+	Write-Host "> Created: $($newItem.FullName)"
 }
 
 task Clean {
@@ -92,6 +96,13 @@ Task Execute-MsBuild -depends Get-TargetSolution {
     Write-Host "> Running MsBuild..."
     exec { msbuild $script:targetSolution.FullName $DynamicArgs $StaticArgs /t:Rebuild /t:Publish > $MsbLog }
     Write-Host "> Done running MsBuild!"
+
+    Write-Host "> Moving items to artefact path"
+    Get-ChildItem CiWebDeploy -Exclude $ArtefactPath -Directory -Recurse | % {
+        Write-Host "> Found: $($_.FullName)"
+        Copy-Item -Path $_.FullName -Destination $ArtefactPath -Recurse
+        Rename-Item "$ArtefactPath\$($_.Name)" -NewName $_.Parent.Name
+    }
 }
 
 properties {
@@ -138,5 +149,14 @@ Task New-NugetPackagesFromSpecFiles -depends Execute-MsBuild {
     #Move all .nupkg files to output folder.
     Get-ChildItem *.nupkg | % {
         Move-Item $_.Name ".\$test\$($_.Name)"
+    }
+}
+
+Task Copy-KaisekiModules {
+    Get-ChildItem -Path $ArtefactPath -Filter kkm-* -Directory | % {
+        Remove-Item $_.FullName -Recurse -Force
+    }
+    Get-ChildItem .\packages -Filter kkm-* -Directory -Recurse | % {
+        Copy-Item -Path $_.FullName -Destination $ArtefactPath -Recurse
     }
 }

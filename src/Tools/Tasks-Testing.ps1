@@ -1,5 +1,6 @@
 properties {
-    $TestProjectSuffix = "UnitTests"
+    $TestProjectSuffix = "Tests"
+    $TestCategory = "Unit"
 }
 task Execute-Nunit -depends Get-TargetSolution -precondition {
     Write-Host ?Execute-Nunit?
@@ -45,13 +46,11 @@ task Execute-Nunit -depends Get-TargetSolution -precondition {
     }) -join ' '
     	
     # Filter test category
-	<#if ($TestCategory -ne "") {
+	if ($TestCategory -ne "") {
 		$targetArgsNunitArgs = $targetArgsNunitArgs + " /include:`"$TestCategory`""
-		$fileCatName = $TestCategory.
-			Replace(",", ".")
-		$targetArgsNunitArgs = $targetArgsNunitArgs.
-            Replace($nunitOut, "nunit.$fileCatName.xml")
-	}#>
+		$fileCatName = $TestCategory.Replace(",", ".")
+		$targetArgsNunitArgs = $targetArgsNunitArgs.Replace($nunitOut, "nunit.$fileCatName.xml")
+	}
 	
 	#solution used as run target.
     $targetArgsArg = "-targetargs:$assemblies $targetArgsNunitArgs"

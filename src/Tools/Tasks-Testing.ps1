@@ -83,7 +83,19 @@ task Copy-Nunit -depends New-CiOutFolder -precondition {
     Copy-Item $nunitRunnersDir.FullName $ArtefactPath -Recurse -Force
 }
 
-task Execute-ReportGenerator {
+task Execute-ReportGenerator -depends Execute-Nunit -precondition {
+    Write-Host ?Execute-Nunit?
+    $nunitRunnersDirs = Get-ChildItem .\packages -Filter NUnit.Runners.* -Directory
+
+    if ($nunitRunnersDirs.Count -eq 0) {
+        Write-Host "> No NUnit runners found."
+        Write-Host "> If you want to run NUnit tests, please do Install-Packages NUnit.Runners"
+        return $false
+    }
+
+    return $true
+
+} {
 	#bin
     $reportGeneratorBinPath = ".\packages\ReportGenerator.1.9.1.0\ReportGenerator.exe"
 

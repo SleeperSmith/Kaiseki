@@ -146,9 +146,9 @@ Task New-NugetPackagesFromSpecFiles -depends Execute-MsBuild {
         &"$NugetBinPath" $command $nuspecFile.FullName -Prop Version=$AssemblyVersion
     }
 
-    #Move all .nupkg files to output folder.
-    Get-ChildItem *.nupkg | % {
-        Move-Item $_.Name ".\$test\$($_.Name)"
+    Write-Host "> Moving nuget packages to artefact path"
+    Get-ChildItem -Path .\ -Filter *.nupkg | % {
+        Copy-Item -Path $_.FullName -Destination $ArtefactPath
     }
 }
 
@@ -159,4 +159,5 @@ Task Copy-KaisekiModules {
     Get-ChildItem .\packages -Filter kkm-* -Directory -Recurse | % {
         Copy-Item -Path $_.FullName -Destination $ArtefactPath -Recurse
     }
+    Copy-Item -Path .\.nuget -Destination .\CiArtefact\kkm-defaults\ -Recurse
 }

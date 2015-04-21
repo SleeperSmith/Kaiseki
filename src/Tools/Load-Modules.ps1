@@ -19,7 +19,7 @@ Task Default -depends Clean,New-CsvOutputCollection,New-CiOutFolder,Transform-In
     Execute-PreBuildAnalysis,Execute-MsBuild,Execute-PostBuildAnalysis,
     Execute-Nunit,Execute-ReportGenerator,
     New-NugetPackagesFromSpecFiles,Write-CsvOutputCollection,
-    Copy-Nunit,Copy-KaisekiModules
+    Copy-Nunit,Copy-TestAssemblies,Copy-KaisekiModules
     
 
 Write-Host "## Loading Modules > Done ##"

@@ -1,5 +1,27 @@
+function Get-TestAssemblies {
+    param(
+        $filter
+    )
+
+    return Get-ChildItem *.csproj -Recurse | ? {
+        $_.FullName -match $filter
+    } | % {
+
+        $searchDirectory = Resolve-Path $_.Directory.FullName -Relative
+
+        # Open up .csproj xml and find assmebly name.
+        [xml]$projectXml = Get-Content $_
+        $assemblyName = $projectXml.Project.PropertyGroup.AssemblyName
+        $assemblyName = $assemblyName.GetValue(0)
+
+        # Get the path to assembly relative to the solution root.
+        # This is done because absolute path containing spaces cause error.
+        return (Get-ChildItem "$searchDirectory\bin\**\$assemblyName.dll" -Recurse)[0]
+    }
+}
+
 properties {
-    $TestProjectSuffix = "Tests"
+    $TestProjectFilter = ".*Test.*"
     $TestCategory = "Unit"
 }
 task Execute-Nunit -depends Get-TargetSolution -precondition {
@@ -26,22 +48,8 @@ task Execute-Nunit -depends Get-TargetSolution -precondition {
 	$solutionName = $targetSolution.Name
 	$outputFolder = "bin\Release\"
 
-    $assemblies = (Get-ChildItem *.csproj -Recurse | ? {
-        #$_.FullName.EndsWith("$TestProjectSuffix.csproj")
-        $true
-    } | % {
-
-        $searchDirectory = Resolve-Path $_.Directory.FullName -Relative
-
-        # Open up .csproj xml and find assmebly name.
-        [xml]$projectXml = Get-Content $_
-        $assemblyName = $projectXml.Project.PropertyGroup.AssemblyName
-        $assemblyName = $assemblyName.GetValue(0)
-
-        # Get the path to assembly relative to the solution root.
-        # This is done because absolute path containing spaces cause error.
-        $assembly = (Get-ChildItem "$searchDirectory\bin\**\$assemblyName.dll" -Recurse)[0]
-        $assemblyRelativePath = (Resolve-Path $assembly.FullName -Relative).Replace(".\", "")
+    $assemblies = ((Get-TestAssemblies -filter $TestProjectFilter) | % {
+        $assemblyRelativePath = (Resolve-Path $_.FullName -Relative).Replace(".\", "")
 
         return "`"$assemblyRelativePath`""
     }) -join ' '
@@ -82,6 +90,21 @@ task Copy-Nunit -depends New-CiOutFolder -precondition {
     $nunitRunnersDir = (Get-ChildItem .\packages -Filter NUnit.Runners.* -Directory)[0]
 
     Copy-Item $nunitRunnersDir.FullName $ArtefactPath -Recurse -Force
+}
+
+task Copy-TestAssemblies -depends Execute-MsBuild {
+    $testAssemblyPath = ".\$ArtefactPath\TestAssemblies\"
+    if (Test-Path $testAssemblyPath) {
+        Remove-Item $testAssemblyPath -Force -Recurse
+	}
+    New-Item -ItemType directory -Path $testAssemblyPath
+
+    Get-TestAssemblies -filter $TestProjectFilter | % {
+        $folderName = $_.Name.SubString(0, $_.Name.Length - 4)
+        $folderName = "$testAssemblyPath\$folderName"
+        New-Item -ItemType directory -Path $folderName
+        Copy-Item -Path "$($_.Directory)\*.*" -Destination $folderName
+    }
 }
 
 task Execute-ReportGenerator -depends Execute-Nunit -precondition {

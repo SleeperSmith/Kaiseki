@@ -15,15 +15,8 @@ $assemblies = (Get-ChildItem ..\TestAssemblies -Directory | % {
 	
 #args
 $fileCatName = $TestCategory.Replace(",", ".")
-$targetArgsNunitArgs = "/xml:`"..\NUnit.$fileCatName.xml`" /include:`"$TestCategory`""
-	
-#solution used as run target.
-$targetArgsArg = "$assemblies $targetArgsNunitArgs"
-
-$targetArgsArg
-$nunitBinPath.FullName
 
 #run
-exec { &$nunitBinPath.FullName $assemblies $targetArgsNunitArgs }
+&$nunitBinPath.FullName $assemblies "/xml:..\NUnit.$fileCatName.xml" "/include:$TestCategory"
 
 Pop-Location

@@ -106,6 +106,7 @@ Task Execute-MsBuild -depends Get-TargetSolution {
 }
 
 properties {
+    $AssemblyVersion = "1.0.0.0"
     $BuildTransformArgs = @{ "AssemblyVersion" = "$AssemblyVersion" }
 }
 Task Transform-InjectBuildInfo {

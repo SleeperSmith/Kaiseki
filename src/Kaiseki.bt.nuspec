@@ -3,8 +3,10 @@
 	<metadata>
 		<id>Kaiseki</id>
 		<version>1.0.0</version>
-		<authors>Jason Chen</authors>
+		<authors>SleeperSmith</authors>
 		<description>A set of psake tasks for building .net solutions.</description>
+		<projectUrl>https://ithub.com/SleeperSmith/Kaiseki</projectUrl>
+		<copyright>MIT</copyright>
 		<dependencies>
 			<dependency id="Mono.Gendarme" version="[2.11.0.20121120]" />
 			<dependency id="OpenCover" version="[4.5.2506]" />

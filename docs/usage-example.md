@@ -26,15 +26,16 @@ Install-Package Kaiseki
 ### Moar Testing!!! ###
 The unit tests are usually run with the build, but there are often integration and end to end testing that require other components such as SQL Server / IIS / Redis / etc, you name it. To do this, retrieve the archived artifacts and run:
 ```
-.\CiArtefact\kkm-default\???
+.\CiArtefact\kkm-defaults\Run-NUnitTests.ps1 -TestCategory "EndToEnd"
 ```
 Note this stage does not generate coverage report as the type of tests run here are generally not worth reporting test coverage on.
 
 ### Deployment - YEEHAWWWWWW!!!! ###
 ```
-.\CiArtefact\kkm-default\???
+.\CiArtefact\kkm-defaults\Deploy-WebDeploy.ps1 -target dev-iis.contoso.net -username user -password pass -xmlsuffix dev
 ```
+Note this assumes there's a server with hostname dev.contoso.net and Site.SetParameters.dev.xml in the CiWebDeploy folder.
 ### Push Nuget ###
 ```
-.\CiArtefact\kkm-default\???
+.\CiArtefact\kkm-defaults\Deploy-Nuget.ps1 -server dev-nuget.contoso.net -password pass
 ```

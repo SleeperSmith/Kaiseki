@@ -18,9 +18,11 @@ Install-Package Kaiseki
 ```
 .\kaiseki-bootstrap\build.ps1
 ```
+Note this step usually happens on the build server.  
 4) You'll see two folders  
 - CiArtefact > Contains the file you need to collect as build artifacts  
 - CiOutput > Contains test and analysis results and test coverage report  
+
 5) Copy the CiArtefact folder to another place to simulate build server artifact gathering. The rest of the steps will only use assets from this folder.
 
 ### Moar Testing!!! ###

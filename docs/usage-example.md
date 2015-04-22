@@ -24,7 +24,7 @@ Install-Package Kaiseki
 5) Copy the CiArtefact folder to another place to simulate build server artifact gathering. The rest of the steps will only use assets from this folder.
 
 ### Moar Testing!!! ###
-The unit tests are usually run with the build, but there are often integration and end to end testing that require other components such as SQL Server / IIS / Redis / etc, you name it. To do this, retrieve the archived artifacts and run:
+The unit tests are usually run with the build, but there are often integration and end to end testing that require other components such as SQL Server / IIS / Redis / etc, you name it that are broken into separate stages. To do this, retrieve the archived artifacts and run:
 ```
 .\CiArtefact\kkm-defaults\Run-NUnitTests.ps1 -TestCategory "EndToEnd"
 ```

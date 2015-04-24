@@ -9,6 +9,14 @@ $deploycmds = Get-ChildItem -Path .\CiArtefact -File -Recurse -Filter Site.Deplo
 
 $deploycmds | % {
     Push-Location $_.Directory.FullName
-    .".\Site.Deploy.cmd" /Y /M:$target /U:$username /P:$password -setParamFile:Site.SetParameters.$xmlsuffix.xml
+    $params = @("/Y","/M:$target")
+
+    if ($username -ne "") {
+        $params += "/U:$username"
+        $params += "/P:$password"
+    }
+    $params += "-setParamFile:Site.SetParameters.$xmlsuffix.xml"
+
+    .".\Site.Deploy.cmd" $params
     Pop-Location
 }

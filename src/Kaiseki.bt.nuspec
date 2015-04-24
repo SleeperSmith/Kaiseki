@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 	<metadata>
 		<id>Kaiseki</id>
-		<version>1.0.0</version>
+		<version>#version#</version>
 		<authors>SleeperSmith</authors>
 		<description>A set of psake tasks for building .net solutions.</description>
 		<projectUrl>https://ithub.com/SleeperSmith/Kaiseki</projectUrl>

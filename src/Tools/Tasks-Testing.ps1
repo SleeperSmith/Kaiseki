@@ -16,7 +16,12 @@ function Get-TestAssemblies {
 
         # Get the path to assembly relative to the solution root.
         # This is done because absolute path containing spaces cause error.
-        return (Get-ChildItem "$searchDirectory\bin\**\$assemblyName.dll" -Recurse)[0]
+        if (Test-Path "$searchDirectory\bin\") {
+            $assemblies = Get-ChildItem "$searchDirectory\bin\**\$assemblyName.dll" -Recurse
+            if ($assemblies.Count -ne 0) {
+                return (Get-ChildItem "$searchDirectory\bin\**\$assemblyName.dll" -Recurse)[0]
+            }
+        }
     }
 }
 

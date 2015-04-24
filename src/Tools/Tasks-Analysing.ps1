@@ -23,14 +23,20 @@ task Execute-Gendarme {
 
         # Get the path to assembly relative to the solution root.
         # This is done because absolute path containing spaces cause error.
-        $assembly = (Get-ChildItem "$searchDirectory\bin\**\$assemblyName.dll" -Recurse)[0]
-        $assemblyRelativePath = (Resolve-Path $assembly.FullName -Relative).Replace(".\", "")
+        if (Test-Path "$searchDirectory\bin\") {
+            $assemblies = Get-ChildItem "$searchDirectory\bin\**\$assemblyName.dll" -Recurse
+            if ($assemblies.Count -ne 0) {
 
-        Write-Host "> Analysing: $assemblyRelativePath"
-        $dllSpecificOut = $gendarmeOutPath.Replace(".xml", ".$assemblyName.xml")
-        Write-Host "> Analysis Result: $dllSpecificOut"
+                $assembly = $assemblies[0]
+                $assemblyRelativePath = (Resolve-Path $assembly.FullName -Relative).Replace(".\", "")
 
-        &$gendarmeBin $assemblyRelativePath --xml $dllSpecificOut > (Out-Null)
+                Write-Host "> Analysing: $assemblyRelativePath"
+                $dllSpecificOut = $gendarmeOutPath.Replace(".xml", ".$assemblyName.xml")
+                Write-Host "> Analysis Result: $dllSpecificOut"
+
+                &$gendarmeBin $assemblyRelativePath --xml $dllSpecificOut > (Out-Null)
+            }
+        }
     }
 }
 
@@ -68,13 +74,17 @@ task Execute-VisualStudioCodeMetrics -precondition {
         # Get the path to assembly relative to the solution root.
         # This is done because absolute path containing spaces cause error.
         try {
-            $assembly = (Get-ChildItem "$searchDirectory\bin\**\$assemblyName.dll" -Recurse)[0]
-            $assemblyRelativePath = (Resolve-Path $assembly.FullName -Relative).Replace(".\", "")
+            if (Test-Path "$searchDirectory\bin\") {
+                $assemblies = Get-ChildItem "$searchDirectory\bin\**\$assemblyName.dll" -Recurse
+                if ($assemblies.Count -ne 0) {
+                    $assemblyRelativePath = (Resolve-Path $assembly.FullName -Relative).Replace(".\", "")
 
-            Write-Host "> Analysing: $assemblyRelativePath"
-            $dllSpecificOut = $vscmOutPath.Replace(".xml", ".$assemblyName.xml")
-            exec { &$VscmBin /f:$assemblyRelativePath /o:$dllSpecificOut /gac }
-            Write-Host "> Analysis Result: $dllSpecificOut"
+                    Write-Host "> Analysing: $assemblyRelativePath"
+                    $dllSpecificOut = $vscmOutPath.Replace(".xml", ".$assemblyName.xml")
+                    exec { &$VscmBin /f:$assemblyRelativePath /o:$dllSpecificOut /gac }
+                    Write-Host "> Analysis Result: $dllSpecificOut"
+                }
+            }
         } catch {
         }
 

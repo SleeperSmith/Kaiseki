@@ -82,7 +82,7 @@ task Execute-VisualStudioCodeMetrics -precondition {
 
                 Write-Host "> Analysing: $assemblyRelativePath"
                 $dllSpecificOut = $vscmOutPath.Replace(".xml", ".$assemblyName.xml")
-                exec { &$VscmBin /f:$assemblyRelativePath /o:$dllSpecificOut /gac }
+                exec { &$VscmBin /f:$assemblyRelativePath /o:$dllSpecificOut /gac /assemblyCompareMode:StrongNameIgnoringVersion }
                 Write-Host "> Analysis Result: $dllSpecificOut"
             }
         }

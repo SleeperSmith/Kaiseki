@@ -73,21 +73,19 @@ task Execute-VisualStudioCodeMetrics -precondition {
 
         # Get the path to assembly relative to the solution root.
         # This is done because absolute path containing spaces cause error.
-        try {
-            if (Test-Path "$searchDirectory\bin\") {
-                $assemblies = Get-ChildItem "$searchDirectory\bin\**\$assemblyName.dll" -Recurse
-                if ($assemblies.Count -ne 0) {
-                    $assemblyRelativePath = (Resolve-Path $assembly.FullName -Relative).Replace(".\", "")
+        if (Test-Path "$searchDirectory\bin\") {
+            $assemblies = Get-ChildItem "$searchDirectory\bin\**\$assemblyName.dll" -Recurse
+            if ($assemblies.Count -ne 0) {
+                
+                $assembly = $assemblies[0]
+                $assemblyRelativePath = (Resolve-Path $assembly.FullName -Relative).Replace(".\", "")
 
-                    Write-Host "> Analysing: $assemblyRelativePath"
-                    $dllSpecificOut = $vscmOutPath.Replace(".xml", ".$assemblyName.xml")
-                    exec { &$VscmBin /f:$assemblyRelativePath /o:$dllSpecificOut /gac }
-                    Write-Host "> Analysis Result: $dllSpecificOut"
-                }
+                Write-Host "> Analysing: $assemblyRelativePath"
+                $dllSpecificOut = $vscmOutPath.Replace(".xml", ".$assemblyName.xml")
+                exec { &$VscmBin /f:$assemblyRelativePath /o:$dllSpecificOut /gac }
+                Write-Host "> Analysis Result: $dllSpecificOut"
             }
-        } catch {
         }
-
     }
 
     # Apparently build fails if nothing exist.

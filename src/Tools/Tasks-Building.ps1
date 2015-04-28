@@ -90,7 +90,7 @@ Task Execute-MsBuild -depends Get-TargetSolution {
     $DynamicArgs = "/p:$MsbConfigurationParam$MsbApcsParam$MsbVsVersionParam"
     Write-Host "> Dynamic Args: $DynamicArgs"
 
-    $StaticArgs = "/p:TargetProfile=Local;DeployTarget=Package;PackageLocation=CiWebDeploy\Site.zip;RunCodeAnalysis=True;DeployOnBuild=True;GenerateManifests=True"
+    $StaticArgs = "/p:DeployTarget=Package;PackageLocation=CiWebDeploy\Site.zip;RunCodeAnalysis=True;DeployOnBuild=True;GenerateManifests=True"
     Write-Host "> Static Args: $StaticArgs"
 
     Write-Host "> Running MsBuild..."

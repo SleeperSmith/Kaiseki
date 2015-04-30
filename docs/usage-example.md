@@ -33,14 +33,16 @@ The unit tests are usually run with the build, but there are often integration a
 Note this stage does not generate coverage report as the type of tests run here are generally not worth reporting test coverage on.
 
 ### Code Coverage Filters ###
-By default, code coverage will be run on everything with the exception of assemblies ending in 'Test' or 'Tests'. This can be extended to exclude other files by passing a 'CodeCoverageFilters' property in the build.ps1 file
+By default, code coverage will be run on everything with the exception of assemblies ending in 'Test' or 'Tests'. This can be extended to exclude other files by passing a 'CodeCoverageFilter' property in the build.ps1 file.
+
 ```
 .\packages\psake.4.3.2\tools\psake.ps1 .\packages\Kaiseki.1.0.5\tools\Load-Modules.ps1 -properties @{
     "TestCategory" = "Unit",
-    "CodeCoverageFilters" = "-[Company.Web]*HelpPage*"
+    "CodeCoverageFilter" = "-[*Tests]* -[*Test]* -[Company.Web]*HelpPage*"
 }
 ```
-The example above will exclude 'HelpPage' classes in the Company.Web module (for example, to exclude the files brought in from [WebApi HelpPage](https://www.nuget.org/packages/Microsoft.AspNet.WebApi.HelpPage). The filters format follows the convention for [OpenCover filters](https://github.com/opencover/opencover/wiki/Usage#user-content-understanding-filters) and gets passed as a command line argument
+
+The example above will exclude the default Test modules as well as any 'HelpPage' classes in the Company.Web module (for example, to exclude the files brought in from [WebApi HelpPage](https://www.nuget.org/packages/Microsoft.AspNet.WebApi.HelpPage). The filters format follows the convention for [OpenCover filters](https://github.com/opencover/opencover/wiki/Usage#user-content-understanding-filters) and gets passed as a command line argument
 
 ### Deployment - YEEHAWWWWWW!!!! ###
 ```

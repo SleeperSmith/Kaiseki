@@ -51,7 +51,7 @@ task Execute-Nunit -depends Get-TargetSolution -precondition {
 	
 	#args
 	$targetArgsNunitArgs = "/config:Release /noshadow /xml:$OutputPath\NUnit.UnitTests.xml"
-	$solutionName = $targetSolution.Name
+	$solutionName = $script:solution.Name
 	$outputFolder = "bin\Release\"
 
     $assemblies = ((Get-TestAssemblies -filter $TestProjectFilter) | % {
@@ -70,14 +70,10 @@ task Execute-Nunit -depends Get-TargetSolution -precondition {
 	#solution used as run target.
     $targetArgsArg = "-targetargs:$assemblies $targetArgsNunitArgs"
 
-	if ($assemblyInclusionPrefix -eq "") {
-		$assemblyInclusionPrefix = $solutionName.Substring(0, $solutionName.Length - 4)
-	}
-
     if ([string]::IsNullOrWhiteSpace($CodeCoverageFilter)) {
-        $CodeCoverageFilter = "+[" + $assemblyInclusionPrefix + "*]* -[*Tests]* -[*Test]*"
+        $CodeCoverageFilter = "+[" + $solutionName.Substring(0, $solutionName.Length - 4) + "*]* -[*Tests]* -[*Test]*"
     }
-    $filterArg = "-filter:$filterInnerArg"
+    $filterArg = "-filter:$CodeCoverageFilter"
 
     $targetArg = "-target:$((Resolve-Path $nunitBinPath.FullName -Relative).Replace('.\', ''))"
     $outputArg = "-output:$OutputPath\opencover.nunit.xml"

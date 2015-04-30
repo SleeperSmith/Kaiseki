@@ -23,6 +23,7 @@ function Get-TestAssemblies {
 properties {
     $TestProjectFilter = ".*Test.*"
     $TestCategory = "Unit"
+    $CodeCoverageFilter = "-[*Tests]* -[*Test]*"
 }
 task Execute-Nunit -depends Get-TargetSolution -precondition {
     Write-Host ?Execute-Nunit?
@@ -67,7 +68,7 @@ task Execute-Nunit -depends Get-TargetSolution -precondition {
 	if ($assemblyInclusionPrefix -eq "") {
 		$assemblyInclusionPrefix = $solutionName.Substring(0, $solutionName.Length - 4)
 	}
-    $filterInnerArg = "+[" + $assemblyInclusionPrefix + "*]* -[*Tests]* -[*Test]*"
+    $filterInnerArg = "+[" + $assemblyInclusionPrefix + "*]* " + $CodeCoverageFilter
     $filterArg = "-filter:$filterInnerArg"
 
     $targetArg = "-target:$((Resolve-Path $nunitBinPath.FullName -Relative).Replace('.\', ''))"

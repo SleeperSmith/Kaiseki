@@ -5,12 +5,12 @@
 		<version>#version#</version>
 		<authors>SleeperSmith</authors>
 		<description>
-			A set of psake tasks for building .net solutions.
-			Simply install the package and run:
-			.\kaiseki-bootstrap\build.ps1
+			A set of psake tasks for building .net solutions.&#xA;
+			Simply install the package and run:&#xA;
+			.\kaiseki-bootstrap\build.ps1&#xA;
 		</description>
 		<projectUrl>https://Github.com/SleeperSmith/Kaiseki</projectUrl>
-		<copyright>© 2011 Jason Chen All Rights Reserved</copyright>
+		<copyright>&#169; 2011 Jason Chen All Rights Reserved</copyright>
 		<dependencies>
 			<dependency id="Mono.Gendarme" version="[2.11.0.20121120]" />
 			<dependency id="OpenCover" version="[4.5.2506]" />

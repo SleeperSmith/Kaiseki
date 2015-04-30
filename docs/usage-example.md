@@ -37,8 +37,8 @@ By default, code coverage will be run on everything with the exception of assemb
 
 ```
 .\packages\psake.4.3.2\tools\psake.ps1 .\packages\Kaiseki.1.0.5\tools\Load-Modules.ps1 -properties @{
-    "TestCategory" = "Unit",
-    "CodeCoverageFilter" = "-[*Tests]* -[*Test]* -[Company.Web]*HelpPage*"
+    "TestCategory" = "Unit,Integration",
+    "CodeCoverageFilter" = "+[Company.Web]* -[*Tests]* -[*Test]* -[Company.Web]*HelpPage*"
 }
 ```
 

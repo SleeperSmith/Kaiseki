@@ -126,7 +126,7 @@ task Execute-ReportGenerator -depends Execute-Nunit -precondition {
 
 } {
 	#bin
-    $reportGeneratorBinPath = ".\packages\ReportGenerator.2.1.4\ReportGenerator.exe"
+    $reportGeneratorBinPath = ".\packages\ReportGenerator.2.1.4.0\ReportGenerator.exe"
 
 	#args
     $reportsArg = "-reports:$OutputPath\opencover.*.xml"

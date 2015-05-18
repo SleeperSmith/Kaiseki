@@ -13,9 +13,9 @@
 		<copyright>&#169; 2011 Jason Chen All Rights Reserved</copyright>
 		<dependencies>
 			<dependency id="Mono.Gendarme" version="[2.11.0.20121120]" />
-			<dependency id="OpenCover" version="[4.5.2506]" />
-			<dependency id="psake" version="[4.3.2]" />
-			<dependency id="ReportGenerator" version="[1.9.1.0]" />
+			<dependency id="OpenCover" version="[4.5.3723]" />
+			<dependency id="psake" version="[4.4.2]" />
+			<dependency id="ReportGenerator" version="[2.1.4]" />
 		</dependencies> 
 	</metadata>
 </package>

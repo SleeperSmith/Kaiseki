@@ -45,7 +45,7 @@ task Execute-Nunit -depends Get-TargetSolution -precondition {
 } {
 
 	#bin paths
-	$opencoverBinPath = ".\packages\OpenCover.4.5.2506\OpenCover.Console.exe"
+	$opencoverBinPath = ".\packages\OpenCover.4.5.3723\OpenCover.Console.exe"
     $nunitRunnersDir = (Get-ChildItem .\packages -Filter NUnit.Runners.* -Directory)[0]
     $nunitBinPath = Get-ChildItem $nunitRunnersDir.FullName -Filter nunit-console.exe -Recurse -File
 	
@@ -126,7 +126,7 @@ task Execute-ReportGenerator -depends Execute-Nunit -precondition {
 
 } {
 	#bin
-    $reportGeneratorBinPath = ".\packages\ReportGenerator.1.9.1.0\ReportGenerator.exe"
+    $reportGeneratorBinPath = ".\packages\ReportGenerator.2.1.4\ReportGenerator.exe"
 
 	#args
     $reportsArg = "-reports:$OutputPath\opencover.*.xml"

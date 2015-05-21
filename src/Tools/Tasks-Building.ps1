@@ -94,7 +94,7 @@ Task Execute-MsBuild -depends Get-TargetSolution {
     Write-Host "> Static Args: $StaticArgs"
 
     Write-Host "> Running MsBuild..."
-    exec { msbuild $script:targetSolution.FullName $DynamicArgs $StaticArgs /t:Rebuild /t:Publish }
+    exec { msbuild $script:solution.FullName $DynamicArgs $StaticArgs /t:Rebuild /t:Publish }
     Write-Host "> Done running MsBuild!"
 
     Write-Host "> Moving items to artefact path"

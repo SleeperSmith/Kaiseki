@@ -9,35 +9,16 @@ task Execute-Gendarme {
 
     # This is defined in the nuspec.
     $gendarmeBin = "$($gendarmeToolsPath)gendarme.exe"
-    $gendarmeOutPath = $OutputPath + "\Gendarme.xml"
     $rulesXml = "rules.xml"
+    # Output Files
+    $gendarmeXmlOutPath = $OutputPath + "\Gendarme.xml"
+    $gendarmeHtmlOutPath = $OutputPath + "\Gendarme.html"
 
-    Get-ChildItem *.csproj -Recurse | %{
-
-        $searchDirectory = Resolve-Path $_.Directory.FullName -Relative
-
-        # Open up .csproj xml and find assmebly name.
-        [xml]$projectXml = Get-Content $_
-        $assemblyName = $projectXml.Project.PropertyGroup.AssemblyName
-        $assemblyName = $assemblyName.GetValue(0)
-
-        # Get the path to assembly relative to the solution root.
-        # This is done because absolute path containing spaces cause error.
-        if (Test-Path "$searchDirectory\bin\") {
-            $assemblies = Get-ChildItem "$searchDirectory\bin\**\$assemblyName.dll" -Recurse
-            if ($assemblies.Count -ne 0) {
-
-                $assembly = $assemblies[0]
-                $assemblyRelativePath = (Resolve-Path $assembly.FullName -Relative).Replace(".\", "")
-
-                Write-Host "> Analysing: $assemblyRelativePath"
-                $dllSpecificOut = $gendarmeOutPath.Replace(".xml", ".$assemblyName.xml")
-                Write-Host "> Analysis Result: $dllSpecificOut"
-
-                &$gendarmeBin $assemblyRelativePath --xml $dllSpecificOut > (Out-Null)
-            }
-        }
+    $assemblies = (Get-CsprojAssemblies -filter ".*\.csproj") | % {
+        $_.Fullname
     }
+
+    &$gendarmeBin $assemblies --html $gendarmeHtmlOutPath --xml $gendarmeXmlOutPath > (Out-Null)
 }
 
 properties {

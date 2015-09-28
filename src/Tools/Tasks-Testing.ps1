@@ -1,30 +1,3 @@
-function Get-TestAssemblies {
-    param(
-        $filter
-    )
-
-    return Get-ChildItem *.csproj -Recurse | ? {
-        $_.FullName -match $filter
-    } | % {
-
-        $searchDirectory = Resolve-Path $_.Directory.FullName -Relative
-
-        # Open up .csproj xml and find assmebly name.
-        [xml]$projectXml = Get-Content $_
-        $assemblyName = $projectXml.Project.PropertyGroup.AssemblyName
-        $assemblyName = $assemblyName.GetValue(0)
-
-        # Get the path to assembly relative to the solution root.
-        # This is done because absolute path containing spaces cause error.
-        if (Test-Path "$searchDirectory\bin\") {
-            $assemblies = Get-ChildItem "$searchDirectory\bin\**\$assemblyName.dll" -Recurse
-            if ($assemblies.Count -ne 0) {
-                return (Get-ChildItem "$searchDirectory\bin\**\$assemblyName.dll" -Recurse)[0]
-            }
-        }
-    }
-}
-
 properties {
     $TestProjectFilter = ".*Test.*"
     $TestCategory = "Unit"
@@ -44,42 +17,53 @@ task Execute-Nunit -depends Get-TargetSolution -precondition {
 
 } {
 
-	#bin paths
-	$opencoverBinPath = ".\packages\OpenCover.4.5.3723\OpenCover.Console.exe"
-    $nunitRunnersDir = (Get-ChildItem .\packages -Filter NUnit.Runners.* -Directory)[0]
-    $nunitBinPath = Get-ChildItem $nunitRunnersDir.FullName -Filter nunit-console.exe -Recurse -File
+	 try {
+        try {
+            ."regsvr32" packages\OpenCover.4.5.3723\x64\OpenCover.Profiler.dll /s
+            ."regsvr32" packages\OpenCover.4.5.3723\x86\OpenCover.Profiler.dll /s
+        } catch {
+        }
+
+	    #bin paths
+	    $opencoverBinPath = ".\packages\OpenCover.4.5.3723\OpenCover.Console.exe"
+        $nunitRunnersDir = (Get-ChildItem .\packages -Filter NUnit.Runners.* -Directory)[0]
+        $nunitBinPath = Get-ChildItem $nunitRunnersDir.FullName -Filter nunit-console.exe -Recurse -File
 	
-	#args
-	$targetArgsNunitArgs = "/config:Release /noshadow /xml:$OutputPath\NUnit.UnitTests.xml"
-	$solutionName = $script:solution.Name
-	$outputFolder = "bin\Release\"
+	    #args
+	    $targetArgsNunitArgs = "/config:Release /noshadow /xml:$OutputPath\NUnit.UnitTests.xml"
+	    $solutionName = $script:solution.Name
+	    $outputFolder = "bin\Release\"
 
-    $assemblies = ((Get-TestAssemblies -filter $TestProjectFilter) | % {
-        $assemblyRelativePath = (Resolve-Path $_.FullName -Relative).Replace(".\", "")
+        $assemblies = ((Get-CsprojAssemblies -filter $TestProjectFilter) | % {
+            $assemblyRelativePath = (Resolve-Path $_.FullName -Relative).Replace(".\", "")
 
-        return "`"$assemblyRelativePath`""
-    }) -join ' '
+            return "`"$assemblyRelativePath`""
+        }) -join ' '
     	
-    # Filter test category
-	if ($TestCategory -ne "") {
-		$targetArgsNunitArgs = $targetArgsNunitArgs + " /include:`"$TestCategory`""
-		$fileCatName = $TestCategory.Replace(",", ".")
-		$targetArgsNunitArgs = $targetArgsNunitArgs.Replace("NUnit.UnitTests.xml", "NUnit.$fileCatName.xml")
-	}
+        # Filter test category
+	    if ($TestCategory -ne "") {
+		    $targetArgsNunitArgs = $targetArgsNunitArgs + " /include:`"$TestCategory`""
+		    $fileCatName = $TestCategory.Replace(",", ".")
+		    $targetArgsNunitArgs = $targetArgsNunitArgs.Replace("NUnit.UnitTests.xml", "NUnit.$fileCatName.xml")
+	    }
 	
-	#solution used as run target.
-    $targetArgsArg = "-targetargs:$assemblies $targetArgsNunitArgs"
+	    #solution used as run target.
+        $targetArgsArg = "-targetargs:$assemblies $targetArgsNunitArgs"
 
-    if ([string]::IsNullOrWhiteSpace($CodeCoverageFilter)) {
-        $CodeCoverageFilter = "+[" + $solutionName.Substring(0, $solutionName.Length - 4) + "*]* -[*Tests]* -[*Test]*"
+        if ([string]::IsNullOrWhiteSpace($CodeCoverageFilter)) {
+            $CodeCoverageFilter = "+[" + $solutionName.Substring(0, $solutionName.Length - 4) + "*]* -[*Tests]* -[*Test]*"
+        }
+        $filterArg = "-filter:$CodeCoverageFilter"
+
+        $targetArg = "-target:$((Resolve-Path $nunitBinPath.FullName -Relative).Replace('.\', ''))"
+        $outputArg = "-output:$OutputPath\opencover.nunit.xml"
+	
+	    #run
+        exec { &$opencoverBinPath $targetArg $filterArg "-register:user" $targetArgsArg $outputArg }
+    } finally {
+        ."regsvr32" -u packages\OpenCover.4.5.3723\x64\OpenCover.Profiler.dll /s
+        ."regsvr32" -u packages\OpenCover.4.5.3723\x86\OpenCover.Profiler.dll /s
     }
-    $filterArg = "-filter:$CodeCoverageFilter"
-
-    $targetArg = "-target:$((Resolve-Path $nunitBinPath.FullName -Relative).Replace('.\', ''))"
-    $outputArg = "-output:$OutputPath\opencover.nunit.xml"
-	
-	#run
-    exec { &$opencoverBinPath $targetArg $filterArg "-register:user" $targetArgsArg $outputArg }
 }
 
 task Copy-Nunit -depends New-CiOutFolder -precondition {
@@ -104,7 +88,7 @@ task Copy-TestAssemblies -depends Execute-MsBuild {
 	}
     New-Item -ItemType directory -Path $testAssemblyPath
 
-    Get-TestAssemblies -filter $TestProjectFilter | % {
+    Get-CsprojAssemblies -filter $TestProjectFilter | % {
         $folderName = $_.Name.SubString(0, $_.Name.Length - 4)
         $folderName = "$testAssemblyPath\$folderName"
         New-Item -ItemType directory -Path $folderName
